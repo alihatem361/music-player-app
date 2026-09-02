@@ -1,10 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer, { sessionExpired } from '../features/auth/authSlice';
-import { registerUnauthorizedHandler } from '../services/api';
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer, { sessionExpired } from "../features/auth/authSlice";
+import favoritesReducer from "../features/favorites/favoritesSlice";
+import playerReducer from "../features/player/playerSlice";
+import playlistsReducer from "../features/playlists/playlistsSlice";
+import recommendationsReducer from "../features/recommendations/recommendationsSlice";
+import tracksReducer from "../features/tracks/tracksSlice";
+import { registerUnauthorizedHandler } from "../services/api";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    favorites: favoritesReducer,
+    player: playerReducer,
+    playlists: playlistsReducer,
+    recommendations: recommendationsReducer,
+    tracks: tracksReducer,
   },
 });
 
