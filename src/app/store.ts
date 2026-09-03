@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { sessionExpired } from '../features/auth/authSlice';
+import playlistsReducer from '../features/playlists/playlistsSlice';
 import { registerUnauthorizedHandler } from '../services/api';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    playlists: playlistsReducer,
   },
 });
 
