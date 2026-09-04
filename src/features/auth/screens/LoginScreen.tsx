@@ -6,10 +6,10 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAppDispatch } from "../../../app/hooks";
 import { ScreenContainer } from "../../../components";
 import { setAuthError, setCredentials } from "../authSlice";
-import { request, toApiError } from "../../../services/api";
+import { toApiError } from "../../../services/api";
 import { useTheme } from "../../../theme";
-import type { AuthTokens } from "../../../types";
 import type { AuthStackParamList } from "../../../navigation/types";
+import { login, register } from "../services/authService";
 interface Props {
   registerMode?: boolean;
 }
@@ -22,6 +22,7 @@ export const LoginScreen: React.FC<Props> = ({ registerMode = false }) => {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+
   const submit = async () => {
     if (registerMode && password !== confirm) {
       dispatch(setAuthError({ message: "Passwords do not match." }));
@@ -30,18 +31,10 @@ export const LoginScreen: React.FC<Props> = ({ registerMode = false }) => {
     setLoading(true);
     try {
       if (registerMode) {
-        await request({
-          url: "/auth/register/",
-          method: "POST",
-          data: { username: email.split("@")[0], email, password },
-        });
+        await register(email, password);
         navigation.goBack();
       } else {
-        const tokens = await request<AuthTokens>({
-          url: "/auth/login/",
-          method: "POST",
-          data: { email, password },
-        });
+        const tokens = await login(email, password);
         dispatch(setCredentials({ tokens }));
       }
     } catch (error) {
@@ -50,6 +43,7 @@ export const LoginScreen: React.FC<Props> = ({ registerMode = false }) => {
       setLoading(false);
     }
   };
+
   const input = (
     label: string,
     value: string,
@@ -118,7 +112,12 @@ export const LoginScreen: React.FC<Props> = ({ registerMode = false }) => {
           <Text style={styles.submitText}>
             {loading ? "Please wait…" : "Let's Start"}
           </Text>
-          <Ionicons name="play" color="#fff" size={18} style={styles.submitIcon} />
+          <Ionicons
+            name="play"
+            color="#fff"
+            size={18}
+            style={styles.submitIcon}
+          />
         </Pressable>
         <Pressable
           onPress={() => {
