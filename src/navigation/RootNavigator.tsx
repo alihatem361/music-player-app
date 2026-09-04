@@ -31,11 +31,8 @@ export const RootNavigator: React.FC = () => {
     <NavigationContainer theme={buildNavigationTheme(theme)}>
       <StatusBar style={theme.mode === 'dark' ? 'light' : 'dark'} />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
           <Stack.Screen name="Main" component={MainTabs} />
-        ) : (
-          <Stack.Screen name="Auth" component={AuthStack} />
-        )}
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
