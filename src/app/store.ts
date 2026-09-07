@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { sessionExpired } from '../features/auth/authSlice';
 import { registerUnauthorizedHandler } from '../services/api';
-
+import recommendationReducer from '../features/recommendations/slice/recommSlice';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+   recommendations: recommendationReducer,
   },
 });
 

@@ -6,7 +6,7 @@ import { FavoritesScreen } from '../features/favorites/screens/FavoritesScreen';
 import { NowPlayingScreen } from '../features/player/screens/NowPlayingScreen';
 import { PlaylistDetailScreen } from '../features/playlists/screens/PlaylistDetailScreen';
 import { PlaylistsScreen } from '../features/playlists/screens/PlaylistsScreen';
-import { DiscoverScreen } from '../features/recommendations/screens/DiscoverScreen';
+import  RecommendationsScreen  from '../features/recommendations/screens/RecScreen';
 import { LibraryScreen } from '../features/tracks/screens/LibraryScreen';
 import { useTheme } from '../theme';
 import type { LibraryStackParamList, MainTabParamList, PlaylistsStackParamList } from './types';
@@ -63,7 +63,7 @@ export const MainTabs: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="Discover" component={DiscoverScreen} />
+      <Tab.Screen name="Discover" component={RecommendationsScreen} />
       <Tab.Screen name="Library" component={LibraryStack} />
       <Tab.Screen name="Playlists" component={PlaylistsStack} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
