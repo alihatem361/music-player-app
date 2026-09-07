@@ -10,7 +10,7 @@ import { AuthStack } from './AuthStack';
 import { MainTabs } from './MainTabs';
 import { buildNavigationTheme } from './navigationTheme';
 import type { RootStackParamList } from './types';
-
+import {LibraryScreen} from "../features/song-library/screens/LibraryScreen";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator: React.FC = () => {
@@ -39,4 +39,8 @@ export const RootNavigator: React.FC = () => {
       </Stack.Navigator>
     </NavigationContainer>
   );
+  <Stack.Screen
+  name="Library"
+  component={LibraryScreen}
+/>
 };
