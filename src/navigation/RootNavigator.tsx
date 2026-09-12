@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { Loader } from '../components';
-import { restoreSession } from '../features/auth/authSlice';
+import { fetchMe, restoreSession } from '../features/auth/authSlice';
 import { useTheme } from '../theme';
 import { AuthStack } from './AuthStack';
 import { MainTabs } from './MainTabs';
@@ -22,6 +22,12 @@ export const RootNavigator: React.FC = () => {
   useEffect(() => {
     void dispatch(restoreSession());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      void dispatch(fetchMe());
+    }
+  }, [dispatch, isAuthenticated]);
 
   if (isBootstrapping) {
     return <Loader label="Loading your music…" />;

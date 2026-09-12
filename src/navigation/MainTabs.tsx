@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { AppDrawer, MiniPlayer } from "../components";
+import { ProfileScreen } from "../features/auth/screens/ProfileScreen";
 import { FavoritesScreen } from "../features/favorites/screens/FavoritesScreen";
 import { NowPlayingScreen } from "../features/player/screens/NowPlayingScreen";
 import { usePlayerEngine } from "../features/player/usePlayerEngine";
@@ -55,6 +56,7 @@ export const MainTabs: React.FC = () => {
           <Tab.Screen name="Library" component={LibraryStack} />
           <Tab.Screen name="Playlists" component={PlaylistsStack} />
           <Tab.Screen name="Favorites" component={FavoritesScreen} />
+          <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>
         <MiniPlayer />
         <AppDrawer />

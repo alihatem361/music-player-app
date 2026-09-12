@@ -6,7 +6,11 @@ import { useTheme } from "../theme";
 interface Props {
   onBack: () => void;
   onAction?: () => void;
-  /** Right-hand glyph; the designs use the sliders icon. */
+  /**
+   * Right-hand glyph. Omit it entirely for screens with no trailing control —
+   * a spacer keeps the title centred. Some designs show a decorative icon with
+   * no behaviour yet, which is why this is independent of `onAction`.
+   */
   actionIcon?: React.ComponentProps<typeof Ionicons>["name"];
   actionLabel?: string;
 }
@@ -15,7 +19,7 @@ interface Props {
 export const ScreenHeader: React.FC<Props> = ({
   onBack,
   onAction,
-  actionIcon = "options-outline",
+  actionIcon,
   actionLabel = "Filter",
 }) => {
   const { colors } = useTheme();
@@ -25,14 +29,24 @@ export const ScreenHeader: React.FC<Props> = ({
       <Pressable accessibilityLabel="Go back" hitSlop={12} onPress={onBack}>
         <Ionicons name="arrow-back" size={24} color={colors.text} />
       </Pressable>
-      <Pressable accessibilityLabel={actionLabel} hitSlop={12} onPress={onAction}>
-        <Ionicons name={actionIcon} size={24} color={colors.text} />
-      </Pressable>
+      {actionIcon ? (
+        <Pressable
+          accessibilityLabel={actionLabel}
+          disabled={!onAction}
+          hitSlop={12}
+          onPress={onAction}
+        >
+          <Ionicons name={actionIcon} size={24} color={colors.text} />
+        </Pressable>
+      ) : (
+        <View style={styles.spacer} />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  spacer: { width: 24 },
   header: {
     marginTop: 34,
     height: 24,

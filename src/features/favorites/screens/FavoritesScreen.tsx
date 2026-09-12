@@ -63,7 +63,7 @@ export const FavoritesScreen: React.FC = () => {
 
   return (
     <ScreenContainer padded={false}>
-      <ScreenHeader onBack={goHome} />
+      <ScreenHeader onBack={goHome} actionIcon="options-outline" />
       <Text style={[styles.title, { color: colors.text }]}>Liked Songs</Text>
       {body()}
     </ScreenContainer>

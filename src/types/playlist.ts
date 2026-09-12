@@ -12,3 +12,11 @@ export interface Playlist extends Omit<PlaylistSummary, 'track_count'> {
   updated_at: string;
   tracks: Track[];
 }
+
+/** `POST /playlists/` echoes the new row without `track_count`. */
+export type PlaylistCreated = Omit<PlaylistSummary, 'track_count'>;
+
+export interface CreatePlaylistPayload {
+  name: string;
+  description?: string;
+}

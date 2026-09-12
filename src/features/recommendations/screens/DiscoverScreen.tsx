@@ -1,38 +1,40 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useEffect } from "react";
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { ErrorView, Loader, ScreenContainer, SongTile } from "../../../components";
+import {
+  ErrorView,
+  Loader,
+  PlaylistCard,
+  ScreenContainer,
+  SongTile,
+} from "../../../components";
 import { useDrawer } from "../../../navigation/DrawerContext";
-import { fetchTracks } from "../../tracks/tracksSlice";
+import type { RootStackParamList } from "../../../navigation/types";
+import { fetchPlaylists } from "../../playlists/playlistsSlice";
 import { useTheme } from "../../../theme";
-import type { Track } from "../../../types";
 import { fetchRecommendations } from "../recommendationsSlice";
 
 interface SectionProps {
   title: string;
-  tracks: Track[];
+  isEmpty: boolean;
   emptyMessage: string;
+  children: React.ReactNode;
 }
 
-const Section: React.FC<SectionProps> = ({ title, tracks, emptyMessage }) => {
+/** Heading + horizontal rail, or a quiet message when the rail has nothing. */
+const Section: React.FC<SectionProps> = ({ title, isEmpty, emptyMessage, children }) => {
   const { colors } = useTheme();
 
   return (
     <>
       <Text style={[styles.heading, { color: colors.text }]}>{title}</Text>
-      {tracks.length === 0 ? (
+      {isEmpty ? (
         <Text style={[styles.empty, { color: colors.textMuted }]}>{emptyMessage}</Text>
       ) : (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.row}
-          data={tracks}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <SongTile track={item} queue={tracks} />}
-        />
+        children
       )}
     </>
   );
@@ -40,16 +42,22 @@ const Section: React.FC<SectionProps> = ({ title, tracks, emptyMessage }) => {
 
 export const DiscoverScreen: React.FC = () => {
   const dispatch = useAppDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { open } = useDrawer();
   const { colors } = useTheme();
   const { items: recommended, status, error } = useAppSelector((state) => state.recommendations);
-  const library = useAppSelector((state) => state.tracks.items);
+  const playlists = useAppSelector((state) => state.playlists.items);
 
   useEffect(() => {
     void dispatch(fetchRecommendations());
-    void dispatch(fetchTracks({ limit: 20 }));
+    void dispatch(fetchPlaylists());
   }, [dispatch]);
+
+  const openPlaylist = (playlistId: number, name: string) =>
+    navigation.navigate("Main", {
+      screen: "Playlists",
+      params: { screen: "PlaylistDetail", params: { playlistId, name } },
+    });
 
   const header = (
     <View style={styles.header}>
@@ -59,7 +67,12 @@ export const DiscoverScreen: React.FC = () => {
       <Pressable
         accessibilityLabel="Search"
         hitSlop={12}
-        onPress={() => navigation.navigate("Main", { screen: "Library" } as never)}
+        onPress={() =>
+          navigation.navigate("Main", {
+            screen: "Library",
+            params: { screen: "LibraryHome" },
+          })
+        }
       >
         <Ionicons name="search" size={22} color={colors.text} />
       </Pressable>
@@ -93,14 +106,38 @@ export const DiscoverScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Section
           title="Recommended for you"
-          tracks={recommended}
+          isEmpty={recommended.length === 0}
           emptyMessage="No recommendations yet."
-        />
+        >
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.row}
+            data={recommended}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => <SongTile track={item} queue={recommended} />}
+          />
+        </Section>
         <Section
-          title="My Playlist"
-          tracks={library}
-          emptyMessage="Your library is empty."
-        />
+          title="My Playlists"
+          isEmpty={playlists.length === 0}
+          emptyMessage="You haven't created any playlists yet."
+        >
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.row}
+            data={playlists}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => (
+              <PlaylistCard
+                playlist={item}
+                size={160}
+                onPress={() => openPlaylist(item.id, item.name)}
+              />
+            )}
+          />
+        </Section>
       </ScrollView>
     </ScreenContainer>
   );

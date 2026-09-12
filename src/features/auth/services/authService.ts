@@ -1,5 +1,5 @@
 import { request } from "../../../services/api";
-import type { AuthTokens } from "../../../types";
+import type { AuthTokens, User } from "../../../types";
 
 export const login = async (
   email: string,
@@ -22,3 +22,5 @@ export const register = async (
     data: { username: email.split("@")[0], email, password },
   });
 };
+
+export const getMe = (): Promise<User> => request<User>({ url: "/auth/me/" });

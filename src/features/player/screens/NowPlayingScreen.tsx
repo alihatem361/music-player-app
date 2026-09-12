@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { EmptyState, ScreenContainer } from "../../../components";
+import { EmptyState, PlaylistPickerSheet, ScreenContainer } from "../../../components";
 import { toggleLike } from "../../favorites/favoritesSlice";
 import { useTheme } from "../../../theme";
 import { formatDuration } from "../../../utils";
@@ -19,6 +19,7 @@ export const NowPlayingScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const { colors } = useTheme();
+  const [picker, setPicker] = useState(false);
 
   const track = player.currentTrack;
 
@@ -65,7 +66,14 @@ export const NowPlayingScreen: React.FC = () => {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Playing Now</Text>
-        <View style={styles.headerSpacer} />
+        <Pressable
+          accessibilityLabel="More options"
+          hitSlop={12}
+          onPress={() => setPicker(true)}
+          style={styles.headerSpacer}
+        >
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.text} />
+        </Pressable>
       </View>
 
       <View style={styles.carousel}>
@@ -165,6 +173,12 @@ export const NowPlayingScreen: React.FC = () => {
           <Ionicons name="play-skip-forward-outline" size={30} color={colors.text} />
         </Pressable>
       </View>
+
+      <PlaylistPickerSheet
+        visible={picker}
+        trackIds={[track.id]}
+        onClose={() => setPicker(false)}
+      />
     </ScreenContainer>
   );
 };

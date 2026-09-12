@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { toApiError } from '../../services/api';
 import { clearTokens, getTokens, saveTokens } from '../../services/tokenStorage';
+import { getMe } from './services/authService';
 import { ApiError, AuthTokens, User } from '../../types';
 
 export type AuthStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -11,6 +13,12 @@ export interface AuthState {
   isBootstrapping: boolean;
   status: AuthStatus;
   error: string | null;
+  /**
+   * Profile loading is tracked separately from `status`/`error`: LoginScreen
+   * renders those, and a background /auth/me/ failure must not surface there.
+   */
+  userStatus: AuthStatus;
+  userError: string | null;
 }
 
 const initialState: AuthState = {
@@ -19,11 +27,24 @@ const initialState: AuthState = {
   isBootstrapping: true,
   status: 'idle',
   error: null,
+  userStatus: 'idle',
+  userError: null,
 };
 
 /** Reads any persisted JWT pair on app start so the user stays signed in. */
 export const restoreSession = createAsyncThunk<AuthTokens | null>('auth/restoreSession', () =>
   getTokens(),
+);
+
+export const fetchMe = createAsyncThunk<User, void, { rejectValue: string }>(
+  'auth/me',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await getMe();
+    } catch (error) {
+      return rejectWithValue(toApiError(error).message);
+    }
+  },
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
@@ -54,6 +75,8 @@ const authSlice = createSlice({
       state.user = null;
       state.tokens = null;
       state.status = 'idle';
+      state.userStatus = 'idle';
+      state.userError = null;
       state.error = 'Your session expired. Please sign in again.';
     },
   },
@@ -75,6 +98,20 @@ const authSlice = createSlice({
         state.tokens = null;
         state.status = 'idle';
         state.error = null;
+        state.userStatus = 'idle';
+        state.userError = null;
+      })
+      .addCase(fetchMe.pending, (state) => {
+        state.userStatus = 'loading';
+        state.userError = null;
+      })
+      .addCase(fetchMe.fulfilled, (state, action) => {
+        state.userStatus = 'succeeded';
+        state.user = action.payload;
+      })
+      .addCase(fetchMe.rejected, (state, action) => {
+        state.userStatus = 'failed';
+        state.userError = action.payload ?? 'Unable to load your profile.';
       });
   },
 });

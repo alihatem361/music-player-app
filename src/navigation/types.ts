@@ -21,6 +21,7 @@ export type MainTabParamList = {
   Library: NavigatorScreenParams<LibraryStackParamList>;
   Playlists: NavigatorScreenParams<PlaylistsStackParamList>;
   Favorites: undefined;
+  Profile: undefined;
 };
 
 export type RootStackParamList = {

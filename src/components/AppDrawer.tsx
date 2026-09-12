@@ -22,7 +22,7 @@ const MENU: MenuItem[] = [
   { icon: "list-outline", label: "Playlists", target: "Playlists" },
   { icon: "chatbox-outline", label: "Contact Us" },
   { icon: "bulb-outline", label: "Learn More" },
-  { icon: "settings-outline", label: "Settings" },
+  { icon: "person-circle-outline", label: "Profile", target: "Profile" },
 ];
 
 /**
@@ -41,10 +41,11 @@ export const AppDrawer: React.FC = () => {
   }
 
   const go = (item: MenuItem) => {
-    close();
-    if (item.target) {
-      navigation.navigate("Main", { screen: item.target } as never);
+    if (!item.target) {
+      return;
     }
+    close();
+    navigation.navigate("Main", { screen: item.target } as never);
   };
 
   return (
@@ -64,7 +65,13 @@ export const AppDrawer: React.FC = () => {
           </Pressable>
         </View>
         {MENU.map((item) => (
-          <Pressable key={item.label} onPress={() => go(item)} style={styles.row}>
+          <Pressable
+            key={item.label}
+            accessibilityState={{ disabled: !item.target }}
+            disabled={!item.target}
+            onPress={() => go(item)}
+            style={[styles.row, !item.target && styles.rowDisabled]}
+          >
             <View style={styles.iconSlot}>
               <Ionicons name={item.icon} size={22} color={colors.textMuted} />
             </View>
@@ -102,6 +109,8 @@ const styles = StyleSheet.create({
   },
   // 56pt pitch from Figma, rendered as a full-height row so the touch target is usable.
   row: { height: 56, flexDirection: "row", alignItems: "center" },
+  // Items the design shows but that have no destination yet.
+  rowDisabled: { opacity: 0.4 },
   iconSlot: { width: 48 },
   label: { fontSize: 20, fontWeight: "400" },
   scrim: { flex: 1 },
